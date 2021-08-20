@@ -1,7 +1,22 @@
-.nav-link{
-    color:#636e72;
+app-all-songs{
+    flex:80%;
+    width: 80%;
 }
 
+nav{
+    align-self: flex-start; 
+    flex: 20%;
+}
+
+.nav-link {
+    color:#95a5a6;
+}
 a:hover{
+    cursor: pointer;
     color:#ffffff;
+}
+
+.active{
+    font-weight: bolder;
+    color: #f5f6fa;
 }

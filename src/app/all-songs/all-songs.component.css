@@ -1,0 +1,38 @@
+h3{
+    color: #ffffff;
+}
+
+#flex-container{
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+}
+.slider-item {
+	width: 100%;
+    height: 270px;
+	flex-shrink: 0;
+    display: flex;
+}
+.controls{
+   text-align: right;
+}
+
+.card{
+    margin-left: 10%;
+    height: 250px;
+}
+a:hover{
+    color: #ffffff;
+}
+#slider-container-outer {
+   overflow: hidden;
+}
+
+.nav-link {
+    display: inline;
+    color: #bdc3c7;
+}
+
+.slider-container-transition {
+    transition: transform 0.7s ease-in-out;
+}

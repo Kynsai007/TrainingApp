@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { AllSongsComponent } from './all-songs/all-songs.component';
 import { FavouriteSongsComponent } from './favourite-songs/favourite-songs.component';
 import { MenuComponent } from './menu/menu.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { MenuComponent } from './menu/menu.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
