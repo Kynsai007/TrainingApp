@@ -14,7 +14,7 @@ h3{
     display: flex;
 }
 .controls{
-   text-align: right;
+   text-align: center;
 }
 
 .card{
@@ -25,7 +25,10 @@ a:hover{
     color: #ffffff;
 }
 #slider-container-outer {
-   overflow: hidden;
+    overflow:hidden;
+    padding: 30px;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
 .nav-link {

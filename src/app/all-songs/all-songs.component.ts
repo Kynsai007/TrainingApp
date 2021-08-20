@@ -53,8 +53,7 @@ export class AllSongsComponent implements OnInit {
     return n1;
 }
   changeOrder(action:string){
-    
-		// change current position
+    // change current position
 		let order = 1;
 
 		// change order from current position till last
