@@ -1,12 +1,24 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, ElementRef, OnInit } from '@angular/core';
+import { ChangeDetectorRef,QueryList, ViewChildren, Component, ElementRef, OnInit } from '@angular/core';
+import {DecimalPipe} from '@angular/common';
+import {Observable} from 'rxjs';
+import { map } from 'rxjs/operators';
 
+import {Songs} from './song';
+import {TableService} from './table.service';
+import {TableDirective, SortEvent} from './table.directive';
 @Component({
   selector: 'app-all-songs',
   templateUrl: './all-songs.component.html',
-  styleUrls: ['./all-songs.component.css']
+  styleUrls: ['./all-songs.component.css'],
+  providers: [TableService, DecimalPipe]
 })
 export class AllSongsComponent implements OnInit {
+  songs$: Observable<Songs[]>;
+  mysongs:Songs[] = [];
+  total$: Observable<number>;
+  @ViewChildren(TableDirective) headers: QueryList<TableDirective>;
+
   allsongs:any;
   num_blocks: number = 0;
 	ready:boolean=false;
@@ -16,7 +28,13 @@ export class AllSongsComponent implements OnInit {
   last_difference:number = 0;
   // position of current item in view
 	current: number = 1;
-  constructor(private http:HttpClient,private el:ElementRef,private changeDetect:ChangeDetectorRef) { }
+  constructor(private http:HttpClient,private el:ElementRef,private changeDetect:ChangeDetectorRef,public service: TableService) { 
+    this.songs$ = service.songs$;
+    this.total$ = service.total$;
+    service.getSongs().subscribe(result => {
+      this.mysongs = result;
+    })
+  }
 
   async ngOnInit(){
     this.allsongs = await this.http.get("https://jsonplaceholder.typicode.com/photos").toPromise();
@@ -25,6 +43,25 @@ export class AllSongsComponent implements OnInit {
     this.addEvent();
     this.num_blocks = Math.ceil(this.allsongs.length/3);
     this.last_difference = this.allsongs.length - this.closestNumber(this.allsongs.length,3);
+      
+  }
+  setFavourite(id:number){
+    let index = this.mysongs.findIndex(a => a.id == id);
+    this.mysongs[index].isfavorite = true;
+    this.service.setSongs(this.mysongs);
+    localStorage.setItem("Favourites",JSON.stringify(this.mysongs.filter(a => a.isfavorite == true)));
+  }
+ 
+  onSort({column, direction}: SortEvent) {
+    // resetting other headers
+    this.headers.forEach(header => {
+      if (header.sortable !== column) {
+        header.direction = '';
+      }
+    });
+
+    this.service.sortColumn = column;
+    this.service.sortDirection = direction;
   }
   counter(range:number){
     let num_array = [];
@@ -35,7 +72,7 @@ export class AllSongsComponent implements OnInit {
   }
   addEvent(){
     let _this = this;
-    this.el.nativeElement.querySelector("#flex-container").addEventListener('transitionend',_this.changeOrder('init'));
+    this.el.nativeElement.querySelector(".flex-container").addEventListener('transitionend', this.changeOrder('init'));
   }
     
   
@@ -84,8 +121,8 @@ export class AllSongsComponent implements OnInit {
         this.start_pos = 0;
         this.end_pos = 3;
       }
-      this.el.nativeElement.querySelector("#flex-container").classList.add('slider-container-transition');
-      this.el.nativeElement.querySelector("#flex-container").style.transform = 'translateX(-100%)';
+      this.el.nativeElement.querySelector(".flex-container").classList.add('slider-container-transition');
+      this.el.nativeElement.querySelector(".flex-container").style.transform = 'translateX(-100%)';
     }
     if(action == 'previous'){
       this.current--;
@@ -99,14 +136,15 @@ export class AllSongsComponent implements OnInit {
         this.end_pos = this.start_pos;
         this.start_pos = this.end_pos - 3;
       }
-      this.el.nativeElement.querySelector("#flex-container").classList.add('slider-container-transition');
-      this.el.nativeElement.querySelector("#flex-container").style.transform = 'translateX(-100%)';
+      this.el.nativeElement.querySelector(".flex-container").classList.add('slider-container-transition');
+      this.el.nativeElement.querySelector(".flex-container").style.transform = 'translateX(-100%)';
     }
     for(let j = this.start_pos;j< this.end_pos;j++){
       this.in_scene_arr.push(this.allsongs[j])
     }
-    //this.el.nativeElement.querySelector("#flex-container").classList.remove('slider-container-transition');
-    //this.el.nativeElement.querySelector("#flex-container").style.transform = 'translateX(0)';
-        
+    setTimeout(() => {
+      this.el.nativeElement.querySelector(".flex-container").classList.remove('slider-container-transition');
+      this.el.nativeElement.querySelector(".flex-container").style.transform = 'translateX(0)';
+    }, 1000);
   }
 }

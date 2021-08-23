@@ -2,7 +2,10 @@ app-all-songs{
     flex:80%;
     width: 80%;
 }
-
+app-favourite-songs{
+    flex: 80%;
+    width: 80%;
+}
 nav{
     align-self: flex-start; 
     flex: 20%;

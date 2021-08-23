@@ -17,4 +17,5 @@
     </ul>
   
   </nav>
-  <app-all-songs></app-all-songs>
+  <app-all-songs *ngIf="all"></app-all-songs>
+  <app-favourite-songs *ngIf="favourite"></app-favourite-songs>

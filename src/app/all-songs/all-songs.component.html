@@ -1,7 +1,18 @@
 <h3>Discover Albums</h3>
 <br>
 <div id="slider-container-outer" *ngIf="ready">
-<div id="flex-container" class="slider-container-transition">
+  <a class="nav-link" (click)="gotoPrevious()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-left-square" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm11.5 5.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
+    </svg>
+    </a>
+    <a class="nav-link" (click)="gotoNext()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-right-square" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+        </svg>
+    </a>
+  <div style="margin-top: 20px;"></div>
+<div class="flex-container">
         <div class="slider-item" *ngFor="let num of counter(num_blocks);" [attr.data-position]="num">
             <div class="card" *ngFor="let b of in_scene_arr" style="width: 11rem;">
                 <img class="card-img-top" src="{{b.thumbnailUrl}}" >
@@ -11,17 +22,52 @@
             </div>
         </div>
 </div>
-<div class="controls">
-    <a class="nav-link" (click)="gotoPrevious()">
-    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-left-square" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm11.5 5.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
-    </svg>
-    </a>
-    <a class="nav-link" (click)="gotoNext()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-right-square" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
-          </svg>
-    </a>
-</div>
+<form>
+    <div class="form-group form-inline">
+        <input class="form-control ml-2" type="text" name="searchTerm" placeholder="Look for Songs..." [(ngModel)]="service.searchTerm"/>
+        <span class="ml-3" *ngIf="service.loading$ | async">Loading...</span>
+    </div>
+  
+    <table class="table">
+      <thead>
+      <tr>
+        <th scope="col" sortable="user" >User Id</th>
+        <th scope="col" sortable="id" >Album ID</th>
+        <th scope="col" sortable="song">Song</th>
+        <th scope="col">Duration</th>
+        <th scope="col">Favourite</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let song of songs$ | async">
+        <th scope="row">{{ song.userId }}</th>
+        <td>
+          <ngb-highlight [result]="song.id | number" [term]="service.searchTerm"></ngb-highlight>
+        </td>
+        <td><ngb-highlight [result]="song.title" [term]="service.searchTerm"></ngb-highlight></td>
+        <td><ngb-highlight [result]="song.time"></ngb-highlight></td>
+        <td *ngIf="song.isfavorite"><button type="button" class="btn btn-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-heart" viewBox="0 0 16 16">
+          <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+        </svg></button></td>
+        <td *ngIf="!song.isfavorite"><button type="button" class="btn btn-secondary" (click)="setFavourite(song.id)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+          <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+        </svg></button></td>
+      </tr>
+      </tbody>
+    </table>
+  
+    <div class="d-flex justify-content-between p-2">
+      <ngb-pagination
+        [collectionSize]="(total$ | async)!" [(page)]="service.page" [pageSize]="service.pageSize">
+      </ngb-pagination>
+  
+      <!-- <select class="custom-select" style="width: auto" name="pageSize" [(ngModel)]="service.pageSize">
+        <option [ngValue]="2">2 items per page</option>
+        <option [ngValue]="4">4 items per page</option>
+        <option [ngValue]="6">6 items per page</option>
+      </select> -->
+    </div>
+  
+  </form>
 </div>
 
